@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 
 import org.json.JSONArray;
@@ -50,6 +51,7 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -232,49 +234,10 @@ public class AuthenticatedActivity extends AppCompatActivity {
                 {
                     result[i] = (byte) 0x4f;
                 }
-                //System.arraycopy(string.getBytes(), 0, result, 100 - string.length(), string.length());
 
-                String base64String = Base64.encodeToString(result, Base64.DEFAULT);
-                String dataToSend = "loggerDataRaw=" + Base64.encodeToString(result, Base64.DEFAULT);
+                String base64String = Base64.encodeToString(result, Base64.NO_WRAP);
 
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                //nameValuePairs.add(new BasicNameValuePair("loggerDataRaw",
-                //        result.toString()));
-
-                nameValuePairs.add(new BasicNameValuePair("loggerDataRaw",
-                        "asdf"));
-
-
-                HttpPost postRequest = new HttpPost("https://fracturemonitor-webapi-dev.azurewebsites.net/api/v1/FlexMove/AddRaw");
-
-                /*
-                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                builder.addTextBody("loggerDataRaw", base64String);
-                */
-                //postRequest.addHeader("Authorization",authorization);
-                postRequest.addHeader("Accept","application/json");
-                postRequest.addHeader("Content-Type","application/json;charset=utf-8");
-                //postRequest.addHeader("Transfer-Encoding", "chunked");
-
-                //postRequest.setEntity(new StringEntity(dataToSend));
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                DataOutputStream dos = new DataOutputStream(baos);
-
-                //dos.writeBytes("loggerDataRaw=");
-                //dos.write(result);
-                ByteArrayInputStream content = new ByteArrayInputStream(baos.toByteArray());
-                BasicHttpEntity entity = new BasicHttpEntity();
-                entity.setChunked(true);
-                entity.setContent(content);
-
-                postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                //postRequest.setEntity(entity);
-                /*
-                HttpEntity multipart = builder.build();
-                postRequest.setEntity(multipart);
-                */
-
+                HttpPost postRequest = new HttpPost("https://fracturemonitor-webapi-dev.azurewebsites.net/api/v1/FlexMove/AddRaw?loggerDataRaw=" + base64String);
 
                 response = httpclient.execute(postRequest);
                 rd = new BufferedReader(new InputStreamReader(
@@ -283,60 +246,6 @@ public class AuthenticatedActivity extends AppCompatActivity {
                 while ((line = rd.readLine()) != null) {
                     System.out.println(line);
                 }
-                /*
-            }
-                HttpsURLConnection urlConnection = new HttpsURLConnection(webAPIendPoint) {
-                    @Override
-                    public String getCipherSuite() {
-                        return null;
-                    }
-
-                    @Override
-                    public Certificate[] getLocalCertificates() {
-                        return new Certificate[0];
-                    }
-
-                    @Override
-                    public Certificate[] getServerCertificates() throws SSLPeerUnverifiedException {
-                        return new Certificate[0];
-                    }
-
-                    @Override
-                    public void disconnect() {
-
-                    }
-
-                    @Override
-                    public boolean usingProxy() {
-                        return false;
-                    }
-
-                    @Override
-                    public void connect() throws IOException {
-
-                    }
-                };
-                */
-
-                HttpsURLConnection urlConnection = (HttpsURLConnection) webAPIendPoint.openConnection();
-
-                //OutputStream os = urlConnection.getOutputStream();
-
-                urlConnection.setUseCaches(false);//set true to enable Cache for the req
-                urlConnection.setDoOutput(true);//enable to write data to output stream
-                //urlConnection.setDoInput(false);
-                urlConnection.setConnectTimeout(30000);
-                urlConnection.setReadTimeout(30000);
-
-                String basicAuth = "Hallo Welt";
-                //urlConnection.setRequestProperty ("Authorization", basicAuth);
-
-                //int responseCode = urlConnection.getResponseCode();
-
-                //if(responseCode == HttpURLConnection.HTTP_OK){
-                //    Log.v("CatalogClient", "HTTP_OK");
-                //}
-
             } catch (Exception e) {
                 Log.e("ERROR", e.getMessage(), e);
                 return null;
