@@ -1,0 +1,13 @@
+*.iml
+.gradle
+android-client/local.properties
+android-client/.idea/workspace.xml
+android-client/.idea/libraries
+.idea/
+android-client/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+android-client/msal/build
+android-client/build
